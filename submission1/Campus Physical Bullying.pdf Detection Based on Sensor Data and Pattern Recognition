@@ -1,0 +1,251 @@
+Campus Physical Bullying Detection Based
+on Sensor Data and Pattern Recognition
+Bo Long1, Jian Liu1, Jun Wang1(B)
+, and Chenguang He2
+1 Harbin Institute of Technology, Weihai, China
+longboemail@163.com, 1638213676@qq.com, jwang@hit.edu.cn
+2 Harbin Institute of Technology, Harbin, China
+hechenguang@hit.edu.cn
+Abstract. Campus bullying is one of the primary problems in education around
+the world which makes teenagers drop out of school or even suicide. Campus bullying can take various forms, such as physical bullying, verbal bullying, Internet bullying and so on. Physical bullying is considered as the most harmful to teenagers.
+Therefore, it is necessary and significant to develop anti-bullying methods. In view
+of the current popularity of smartphones among the student population, this article proposes a scheme for using the smartphone’s built-in acceleration sensor and
+gyroscope to collect student activity data and using pattern recognition technology
+to identify students’ status. This paper uses Relief-F algorithm for feature selection and then uses PCA for feature dimensionality reduction and finally extracts
+three kinds of features from acceleration and gyrodata. The author used the k-NN
+algorithm as classifiers. In the final test, bullying and non-bullying recognition
+accuracies of k-NN were 84.13% and 76.92%, respectively. The result indicated
+that motion recognition based on k-NN can obtain a good classification effect in
+physical bullying detection.
+Keywords: Campus bullying · K-NN · Pattern recognition · Physical bullying
+1 Introduction
+Campus bullying is a common problem around the world which seriously affects victim’s
+physical and mental health [1]. However, after being abused by bullies, victims often dare
+not report the situation to teachers and parents due to fear [2]. Without timely supervision
+and prevention, the phenomenon of campus bullying will become more and more serious
+[3]. Therefore, it is necessary and important to develop measures to automatically detect
+school violence.
+With the rapid development of machine learning technology in recent years, motion
+recognition research has become a hot field [4]. Research on motion recognition has
+become a hot topic in mainstream international conferences on pattern recognition [5].
+Campus bullying can take various forms, such as physical bullying, language bullying,
+© The Author(s), under exclusive license to Springer Nature Singapore Pte Ltd. 2021
+Q. Liang et al. (eds.), Communications, Signal Processing, and Systems, Lecture Notes in Electrical Engineering 654,
+https://doi.org/10.1007/978-981-15-8411-4_126
+Campus Physical Bullying Detection Based on Sensor Data … 955
+and network bullying, among which physical bullying is the most harmful. Aim at this
+problem, this paper proposes a method of automatic detection of physical bullying based
+on motion recognition.
+2 Research Status
+With the development of smart phones, people can obtain a variety of anti-bullying app,
+such as Stop bullies, Bully Box, Black Box. These applications all work in the same
+way [6]. When the bullying incident occurs, the victim or witness needs to take out the
+mobile phone to run the app and manually send an alarm message. This method is not
+convenient for the victim. Therefore, people need a method which can automatically
+detect the state of the victim and send an alarm message when the victim is bullied.
+In the past ten years, motion recognition technology has greatly developed, and
+the accuracy of motion recognition has been greatly improved [7]. Motion recognition
+technology has been applied to the smart home system [8]. Therefore, motion recognition
+technology is mature enough to perform campus bullying detection.
+3 Physical Bullying Detection Method
+Most of bullying actions will cause drastic changes in the physical state of the bullied
+person, resulting in large displacements, accelerations, etc., on the body. Mobile phones
+are often equipped with accelerometers, gyroscopes sensors, etc. Through these sensors,
+the holder’s acceleration, gyro and other information can be collected to provide automatic bullying detection. The action experiment data in this paper were collected by
+fixing the smartphone to the waist of the tester, which can reflect the overall movement
+state of the human body well [9].
+In order to distinguish between bullying movements such as hitting and pushing
+down and non-bullying movements such as walking and jumping, this paper collect
+accelerometer and gyroscope sensor data of five typical bullying movements and six
+typical daily movements (Table 1).
+The data collected are not necessarily accurate, the correction method is used to
+calculate the true data. The acceleration of the standing data should be accy = g, accx
+= accz = 0. In fact, the recorded data are accx = a, accy = b, accz = c. From the above
+data, the original three-dimensional coordinate system can be calculated as the rotation
+angles of α, β, and γ along the x-axis, y-axis, and z-axis. Then get the deflection matrix.
+I =
+⎡
+⎣
+cos(γ) sin(γ) 0
+− sin(γ) cos(γ) 0
+0 01
+⎤
+⎦
+⎡
+⎣
+cos(β) 0 − sin(β)
+01 0
+sin(β) 0 cos(β)
+⎤
+⎦
+⎡
+⎣
+10 0
+0 cos(α) sin(α)
+0 − sin(α) cos(α)
+⎤
+⎦ (1)
+According to the relationship between the true value vector, the measured value
+vector and the deflection matrix, the true value is equal to the inverse of the deflection
+matrix multiplied by the measured value.
+Rl = I - 1 × Rb (2)
+956 B. Long et al.
+Table 1. Five typical bullying actions and six typical non-bullying actions used in data
+Action class Action type
+Bullying class Beat
+Push
+Shake
+Push down
+Shoulder hit
+Non-bullying class Fall down
+Jump
+Play
+Run
+Stand
+Walk
+After correcting the original data, the initial observation still found some measurement noise. For this reason, some commonly used low-pass filters were tested. To reduce
+noise and retain more data information, this paper chooses wavelet filtering to filter the
+original data (Fig. 1).
+After smooth preprocessing, the data are further classified into bullying and nonbullying actions. Then extract the features of the sample data from the horizontal acceleration components accx and accz, the vertical acceleration component accy, and the
+three-axis gyroscope x-axis, y-axis, z-axis components gyrox, gyroy, gyroz. To this end,
+this paper constructed 57-dimensional initial features, including five statistical features in
+time domain and first-order differential in time domain: mean, maximum, minimum, zero
+crossing ratio, and median absolute difference and four statistical features in frequency
+domain: mean, maximum, minimum, and energy.
+Time domain first-order forward differential, taking accx’s first-order differential for
+example:
+daccxk = accxk+1 − accxk k = 1, 2, 3 ··· n (3)
+The calculation methods of the horizontal acceleration vector and the three-axis
+vector of the gyroscope are:
+accxz =
+
+accx2 + accz2
+
+0.5 (4)
+gyroxyz =
+
+gyrox2 + gyroy2 + gyroz2
+0.5
+(5)
+In addition, perform Fourier transforming on the original data to obtain frequency
+data. The calculation method is given as follows, taking accx frequency domain data
+faccx for example,
+faccx = fft(accx) (6)
+Campus Physical Bullying Detection Based on Sensor Data … 957
+Fig. 1. Horizontal acceleration signal and the signal after passing through different filters
+Zero-crossing ratio and frequency domain energy calculations normalize the window
+length.
+The formula for the median absolute difference is:
+mad(accx) = median(|accx − median(accx)|) (7)
+Find the above 57-dimensional features of the collected data samples according to
+the type of actions, then synthesize according to whether the action type is bullying or
+non-bullying (Table 2).
+For the extracted features, feature selection must be further carried out, because the
+extraction of features is not designed according to the specific distribution of the data.
+When these features are used to classify the samples, there may be some features that
+contribute little or none. So, the features that did not contribute much to the classification
+should be dropped. One possible feature selection method is to observe the distribution
+of features through quartile box plots (Fig. 2).
+Because there are many features initially extracted, it is not suitable to filter features
+by observing the quartile box plot. This paper uses the improved relief algorithm. Relief
+algorithm is a kind of feature weighting algorithm, which gives different weights to
+958 B. Long et al.
+Table 2. 57-dimensional features extracted from acceleration and gyroscope data
+Feature Extracted from Amount
+Mean accy accxz gyrox gyroy gyroz gyroxyz faccy faccxz fgyroxyz
+daccy daccxz dgyroxyz
+12
+Max accy accxz gyrox gyroy gyroz gyroxyz faccy faccxz fgyroxyz
+daccy daccxz dgyroxyz
+12
+Min accy accxz gyrox gyroy gyroz gyroxyz faccy faccxz fgyroxyz
+daccy daccxz dgyroxyz
+12
+Zero crossing ratio accy accxz gyrox gyroy gyroz gyroxyz daccy daccxz dgyroxyz 9
+MAD accy accxz gyrox gyroy gyroz gyroxyz daccy daccxz dgyroxyz 9
+Energy faccy faccxz fgyroxyz 3
+beat falldown jump play push pushdown run shake walk shoulderhit stand
+Action type
+0
+500
+1000
+1500
+2000
+2500
+3000
+3500
+Y-axis acceleration frequency domain energy feature
+Fig. 2. Quartile box plot of frequency domain energy feature of y-axis acceleration
+features according to the correlation of each feature and category. Features with weights
+less than a certain threshold will be removed.
+This paper uses the relief-f algorithm to select features and remove features that
+do not contribute to the classification. After feature selection, there are 24-dimensional
+features but the dimension of the features is still too large, because only the mobile
+phone as a hardware platform has limited computing resources. Therefore, the principal
+component analysis (PCA) method is used to further reduce the dimensions of the features. The PCA algorithm analyzes the principal components in the feature space. After
+dimensionality reduction, the feature dimension can be reduced while still retaining most
+Campus Physical Bullying Detection Based on Sensor Data … 959
+of the data information. This paper takes the first four-dimensional feature vector after
+dimensionality reduction, which still retains 98.87% information of the original features.
+In this paper, the classification goal is to distinguish between bullying actions and
+non-bullying actions, and the N-fold cross-validation training model is used. Here, the
+bullying feature matrix and the non-bullying feature matrix are both divided into two.
+The first group of bullying samples and non-bullying samples is combined into a training
+set, a second group of bullying and non-bullying samples are combined into a testing set,
+the training set trains a classifier and uses the testing set to verify, and finally exchanges
+the training set and the test set. The final result is the average of the two.
+4 Experiments and Conclusions
+Using the above sample collection method, a total of 299 samples of five types of bullying
+actions and six types of non-bullying actions were collected, and 57-dimensional features
+were extracted for each sample. After the relief-f algorithm feature selection and the
+PCA algorithm feature dimensionality reduction, the first four dimensional principal
+components are taken for classifier design and testing.
+For the k-NN classifier, the k value of the nearest neighbor coefficient is adjusted,
+and the testing set and the training set are tested by the classifier. The classification result
+of the testing set reflects the performance of the classifier (Fig. 3).
+Fig. 3. Accuracy of different k values of the k-NN algorithm, the optimal k is 5
+Through comparison, the k-NN model with the number of nearest neighbors k of
+5 is finally selected, the classification results of the training set reflects no over-fitting,
+and good results are obtained. The recognition accuracies of bullying and non-bullying
+960 B. Long et al.
+Table 3. Confusion matrix of k-NN classifier when k = 5
+Activities recognized as Bullying (%) Non-bullying (%)
+Bullying 84.13 15.87
+Non-bullying 23.08 76.92
+actions are 84.13% and 76.92%, respectively. The confusion matrix is given as follows
+(Table 3):
+Some common indicators that measure the recognition effect of the classifier are
+given as follows:accuracy = TP+TN
+P+N = 0.8046, precision = TP
+TP+FP = 0.7794 and
+recall = TP
+TP+FN = 0.8413, F1 indicator which is the harmonic mean of recall and
+precision is 0.8092.
+The above results show that the 57-dimensional initial features of feature extraction and the four-dimensional features after feature reduction can reflect the difference
+between bullying and non-bullying actions. The designed k-NN classifier with k = 5
+has an average accuracy of over 80%, indicating that using a smartphone as a detection
+platform to identify action bullying is very promising, thus providing a convenient and
+easy way for the automatic detection of campus bullying.
+Acknowledgements. This work was supported by National Natural Science Foundation of China
+under Grant No.61971158.
+References
+1. Kim YS, Leventhal B (2008) Bullying and suicide. a review. Int J Adolesc Med Health
+20(2):133–154
+2. Menesini E, Salmivalli C (2017) Bullying in schools: the state of knowledge and effective
+interventions[J]. Psychol Health Med 22(sup1):240–253
+3. Olweus D (2013) School bullying: development and some important challenges[J]. Annu Rev
+Clin Psychol
+4. Brahnam S, Roberts JJ , Nanni L et al (2015) Design of a bullying detection/alert system for
+school-wide intervention[J]
+5. Peng L, Chen L, Wu M et al (2019) complex activity recognition using acceleration, vital sign,
+and location data[J]. IEEE Trans Mob Comput 18(7):1488–1498
+6. Ye L, Ferdinando H, Seppänen T et al (2014) Physical violence detection for preventing school
+bullying[J]. Adv Artif Intell 2014(2):1–9
+7. Zalluhoglu C, Ikizler-Cinbis N (2019) Region based multi-stream convolutional neural
+networks for collective activity recognition[J]. J Visual Commun Image Represen 60
+8. Hache G, Lemaire ED, Baddour N (2010) Mobility changeof-state detection using a
+smartphone-based approach, in Proceedings of the IEEE InternationalWorkshop on Medical
+Measurements and Applications (MeMeA ’10), pp. 43–46, Ottawa, Canada, May 2010
+9. Hache G, Lemaire ED, Baddour N (2011) Wearable mobility monitoring using a multimedia
+smartphone platform[J]. IEEE Transactions on Instrumentation & Measurement 60(9):3153–
+3161
